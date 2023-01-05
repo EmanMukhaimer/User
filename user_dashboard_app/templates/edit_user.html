@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <title>Document</title>
+</head>
+<body style="padding: 20px;">
+    {% if request.session.loged_in_user == True%}
+    <div style="border-bottom: 1pt black solid;" >
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Test App</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/user_dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active"  href="{% url 'view_user' request.session.loged_in_user_id %}">Profile</a>
+                    </li>
+                    </ul>
+                    <a class="navbar-brand" href="/logout">
+                    Log off
+                    </a>
+                </div>
+                </div>
+            </nav>
+    </div>
+    {% else %}
+    <div style="border-bottom: 1pt black solid;" >
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Test App</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/">Home</a>
+                    </li>
+                    </ul>
+                    <a class="navbar-brand" href="/sign_in">
+                    Sign in
+                    </a>
+                </div>
+                </div>
+            </nav>
+    </div>
+    {% endif %}
+    <div>
+        {% if messages %}
+        <ul class="messages">    
+        {% for message in messages %}    
+            <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
+        {% endfor %}
+        </ul>
+        {% endif %}
+        {% if admins %}
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Edit user # {{user.id}}</h2>
+            <a href="/user_dashboard">
+                <button>Return to Dashboard</button>
+            </a>
+        </div>
+        {% else %}
+        <h2>Edit profile</h2>
+        {% endif %}
+        {% if messages %}
+        <ul class="messages">    
+        {% for message in messages %}    
+            <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
+        {% endfor %}
+        </ul>
+        {% endif %}
+        {% if admins %}
+        <div style="display: flex; justify-content: space-between;">
+            <div>
+                <h3>Edit Information</h3>
+                <form action="/edit_information" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="user" value="{{user.id}}">
+                    <lable>Email Address:</lable><br>
+                    <input type="text" name="email" value="{{user.email}}"><br>
+                    <lable>First Name:</lable><br>
+                    <input type="text" name="first_name" value="{{user.first_name}}"><br>
+                    <lable>Last Name:</lable><br>
+                    <input type="text" name="last_name" value="{{user.last_name}}"><br>
+                    <lable>User Level:</lable><br>
+                    <select name="rule" >
+                        <option value="normal" selected="">Normal</option>
+                        <option value="admin" selected="selected">Admin</option>
+                    </select><br>
+                    <input type="submit" value="Save">
+                </form>
+            </div>
+            <div>
+                <h3>Change Password</h3>
+                <form action="/edit_password" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="user" value="{{user.id}}">
+                    <lable>Password:</lable><br>
+                    <input type="password" name="password"><br>
+                    <lable>Password Confirmation:</lable><br>
+                    <input type="password" name="conf_pass" ><br>
+                    <input type="submit" value="Update Password">
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div style="display: flex; justify-content: space-between;">
+            <div>
+                <h3>Edit Information</h3>
+                <form action="/edit_information" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="user" value="{{user.id}}">
+                    <lable>Email Address:</lable><br>
+                    <input type="text" name="email" value="{{user.email}}"><br>
+                    <lable>First Name:</lable><br>
+                    <input type="text" name="first_name" value="{{user.first_name}}"><br>
+                    <lable>Last Name:</lable><br>
+                    <input type="text" name="last_name" value="{{user.last_name}}"><br>
+                    <input type="hidden" name="rule" value="{{user.rule}}">
+                    <input type="submit" value="Save">
+                </form>
+            </div>
+            <div>
+                <h3>Change Password</h3>
+                <form action="/edit_loged_in_user_password" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="user" value="{{user.id}}">
+                    <lable>Password:</lable><br>
+                    <input type="password" name="password"><br>
+                    <lable>Password Confirmation:</lable><br>
+                    <input type="password" name="conf_pass" ><br>
+                    <input type="submit" value="Update Password">
+                </form>
+            </div>
+        </div>
+        <div>
+            <form action="/edit_description" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="user" value="{{user.id}}">
+                <lable>Edit Description:</lable><br>
+                <input type="text" name="description" value="{{user.description}}"><br>
+                <input type="submit" value="Save">
+            </form>
+        </div>
+        {% endif %}
+        
+    </div>
+</body>
+</html>

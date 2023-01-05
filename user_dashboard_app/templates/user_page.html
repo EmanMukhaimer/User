@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <title>Document</title>
+</head>
+<body style="padding: 10px;">
+    {% if request.session.loged_in_user == True  %}
+    <div style="border-bottom: 1pt black solid;" >
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Test App</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/user_dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active"  href="{% url 'view_user' request.session.loged_in_user_id %}">Profile</a>
+                    </li>
+                    </ul>
+                    <a class="navbar-brand" href="/logout">
+                    Log off
+                    </a>
+                </div>
+                </div>
+            </nav>
+    </div>
+    {% else %}
+    <div style="border-bottom: 1pt black solid;" >
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Test App</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/">Home</a>
+                    </li>
+                    </ul>
+                    <a class="navbar-brand" href="/sign_in">
+                    Sign in
+                    </a>
+                </div>
+                </div>
+            </nav>
+    </div>
+    {% endif %}
+    <div>
+        <div >
+            <h2>{{user.first_name}} {{user.last_name}}</h2>
+            <table>
+                <tr><td>Registered at:</td> <td>{{user.created_at}}</td></tr>
+                <tr><td>User ID:</td> <td>{{user.id}}</td></tr>
+                <tr><td>Email address:</td> <td>{{user.email}}</td></tr>
+                <tr><td>Description:</td> <td>{{user.description}}</td></tr>
+            </table>
+        </div>
+        <h3>Leave a message for {{user.first_name}} </h3>
+        <form action="{% url 'post_message' user.id %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="user" value="{{user.id}}">
+            <input type="text" name="message" style="width: 100%;">
+            <div style="display: flex; justify-content: right;">
+                <input type="submit" value="Post a message" style="background-color: blue; color: white; border: solid black 1pt; box-shadow: 1pt 1pt black; display: block; margin-top: 10px;">
+            </div>
+        </form>
+        <div>
+            {% for message in messages%}
+                <p style="display: block;"><a href="{% url 'view_user' message.written_by.id %}">{{message.written_by.first_name}}  {{message.written_by.last_name}}</a> wrote  {{message.created_at}}</p>
+                <p style="display: block; border: 1pt black solid;">{{message.message}}</p>
+                
+                <div style="padding-left: 20px ;">
+
+                    {% for comment in message.comments.all %}
+                    <p style="display: block;"> <a href="{% url 'view_user' user.id %}">{{comment.user.first_name}} {{comment.user.last_name}}</a> wrote -{{comment.created_at}}</p>
+                    <p style="display: block;">{{comment.comment}}</p>
+                    {% endfor %}
+                    <form action="{% url 'post_comment' user.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="user" value="{{user.id}}" >
+                        <input type="hidden" name="message" value="{{message.id}}">
+                        <input type="text" placeholder="write a comment" name="comment" style="width: 100%;" style="display: block;">
+                        <div style="display: flex; justify-content: right;">
+                            <input type="submit" value="Post a comment" style="background-color: green; color: white; border: solid black 1pt; box-shadow: 1pt 1pt black; display: block; margin-top: 10px;">
+                        </div>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
